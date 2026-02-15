@@ -1,0 +1,22 @@
+# Binaries
+Digest Engine
+*.exe
+
+# Data
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Config (secrets)
+config.yaml
+
+# Go
+vendor/
+*.test
+*.out
+
+# IDE
+.vscode/
+.idea/
+*.swp

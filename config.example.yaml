@@ -1,0 +1,76 @@
+# Digest Engine Configuration
+
+# Database
+database:
+  path: "data/Digest Engine.db"
+
+# Feed Sources
+feeds:
+  # Hacker News
+  - id: "hn-top"
+    url: "https://hnrss.org/newest?points=100"
+    schedule: "daily"
+    min_score: 100
+    blocklist:
+      - "(?i)who is hiring"
+      - "(?i)ask hn"
+
+  # Reddit
+  - id: "reddit-golang"
+    url: "https://www.reddit.com/r/golang/top/.rss?t=day&limit=25"
+    schedule: "weekly"
+    min_score: 50
+    blocklist:
+      - "(?i)tutorial"
+
+  - id: "reddit-devops"
+    url: "https://www.reddit.com/r/devops/top/.rss?t=week"
+    schedule: "weekly"
+    min_score: 30
+
+  # Dev.to
+  - id: "devto-kubernetes"
+    url: "https://dev.to/feed/tag/kubernetes"
+    schedule: "weekly"
+    min_score: 10
+
+  # Lobsters
+  - id: "lobsters-devops"
+    url: "https://lobste.rs/t/devops.rss"
+    schedule: "weekly"
+    min_score: 5
+
+  # Product Hunt (must poll daily to build monthly dataset)
+  - id: "producthunt"
+    url: "https://www.producthunt.com/feed"
+    schedule: "monthly"
+    min_score: 100
+
+# Schedules (cron syntax)
+schedules:
+  daily: "0 8 * * *"      # 8 AM every day
+  weekly: "0 9 * * 5"     # 9 AM every Friday
+  monthly: "0 9 1 * *"    # 9 AM on 1st of month
+
+# SMTP Configuration
+smtp:
+  host: "smtp.gmail.com"
+  port: 587
+  username: "your-email@gmail.com"
+  password: "${Digest Engine_SMTP_PASSWORD}"  # Use env var
+  from: "Digest Engine@yourdomain.com"
+  to: "you@example.com"
+
+# Poller Configuration
+poller:
+  workers: 10             # Concurrent feed fetchers
+  timeout: "30s"          # HTTP timeout per feed
+
+# Observability
+metrics:
+  enabled: true
+  port: 9090              # Prometheus /metrics endpoint
+
+logging:
+  level: "info"           # debug, info, warn, error
+  format: "json"          # json or text
