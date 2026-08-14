@@ -242,7 +242,7 @@ func (c *Config) Validate() error {
 
 ## Future Enhancements
 
-- [ ] Local LLM summarization (Ollama integration)
+- [x] Zero-Fluff & Anti-Clickbait enrichment pipeline (see [ENRICHMENT_DESIGN.md](file:///Users/gordonpn/workspace/digest-engine/ENRICHMENT_DESIGN.md))
 - [ ] Web UI for browsing archive
 - [ ] Webhook receiver for "Save to Notion"
 - [ ] Multi-user support (user table, per-user configs)

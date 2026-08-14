@@ -33,6 +33,7 @@ Digest Engine solves the problem of information overload by:
 - [x] Flexible scheduling (daily/weekly/monthly digests)
 - [x] De-duplication across digest periods
 - [x] Noise filtering via regex blocklists
+- [x] Zero-Fluff & Anti-Clickbait enrichment pipeline (see [ENRICHMENT_DESIGN.md](file:///Users/gordonpn/workspace/digest-engine/ENRICHMENT_DESIGN.md))
 
 ### Supported Sources
 - Reddit (subreddits via `/top/.rss`, `/new/.rss`)
