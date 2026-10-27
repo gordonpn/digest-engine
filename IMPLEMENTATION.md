@@ -2,6 +2,8 @@
 
 This document provides step-by-step instructions for a coding agent (or developer) to implement Digest Engine.
 
+> **Status:** The examples below are an early implementation sketch. Follow [ADR 0001](docs/adr/0001-northflank-postgresql-and-self-hosted-sqlite.md) and [Product Direction](docs/PRODUCT_DIRECTION.md) for current deployment and product constraints. New application logic must remain independent of database drivers; the first hosted profile uses PostgreSQL, and SQLite is the future self-hosted target.
+
 ## Phase 1: Core Infrastructure (Week 1)
 
 ### 1.1 Project Setup

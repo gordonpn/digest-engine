@@ -1,41 +1,44 @@
 # Digest Engine
 
-A self-hosted RSS/Atom feed aggregator with intelligent digest scheduling. Built in Go for deployment on Kubernetes/K3s.
+A personal information reader that collects RSS/Atom feeds and newsletters, then helps surface and revisit useful stories.
+
+> **Project status:** This repository is a design scaffold with examples; it does not yet contain a Go application. Feature checkboxes below describe planned behavior.
+
+See [Product Direction](docs/PRODUCT_DIRECTION.md) and [ADR 0001](docs/adr/0001-northflank-postgresql-and-self-hosted-sqlite.md) for current decisions and deferred ideas.
 
 ## Overview
 
 Digest Engine solves the problem of information overload by:
-- Polling RSS feeds continuously (capturing score/engagement data over time)
-- Storing items in a local database with historical metrics
-- Generating scheduled digests (daily/weekly/monthly) with top content
-- Filtering noise and de-duplicating across digest periods
+- Polling RSS feeds and ingesting newsletters sent to a dedicated address
+- Storing source material and extracted items with provenance
+- Surfacing useful items in a persistent web reader
+- Offering scheduled digests as an optional delivery path
 
 ## Architecture
 
 ```
 ┌─────────┐      ┌───────┐      ┌──────────┐
-│ Poller  │─────>│SQLite │<─────│ Digester │
-│(Hourly) │      │ Store │      │ (Cron)   │
+│ Sources │─────>│Ingest │─────>│Database │
+│ RSS/Email│     │       │      │         │
 └─────────┘      └───────┘      └──────────┘
                                       │
-                                      ▼
-                                 ┌────────┐
-                                 │ Email  │
-                                 │ SMTP   │
-                                 └────────┘
+                         ┌────────────┴──────────┐
+                         ▼                       ▼
+                    ┌────────┐             Optional email
+                    │Reader  │
+                    └────────┘
 ```
 
 ## Features
 
 ### Core
-- [x] Multi-source RSS/Atom feed polling
-- [x] Score tracking (Reddit karma, HN points, PH upvotes)
-- [x] Flexible scheduling (daily/weekly/monthly digests)
-- [x] De-duplication across digest periods
-- [x] Noise filtering via regex blocklists
-- [x] Zero-Fluff & Anti-Clickbait enrichment pipeline (see [ENRICHMENT_DESIGN.md](file:///Users/gordonpn/workspace/digest-engine/ENRICHMENT_DESIGN.md))
+- [ ] Multi-source RSS/Atom and newsletter ingestion
+- [ ] Source-aware ranking and reading history
+- [ ] Cross-source article de-duplication
+- [ ] Noise filtering and content-aware extraction
+- [ ] Zero-Fluff & Anti-Clickbait enrichment pipeline (see [ENRICHMENT_DESIGN.md](ENRICHMENT_DESIGN.md))
 
-### Supported Sources
+### Planned Sources
 - Reddit (subreddits via `/top/.rss`, `/new/.rss`)
 - Hacker News (via hnrss.org)
 - Dev.to (tag-specific feeds)
@@ -43,11 +46,13 @@ Digest Engine solves the problem of information overload by:
 - Hashnode (tag feeds)
 - Stack Exchange (hot/newest feeds)
 - Product Hunt (daily feed, aggregated monthly)
+- Substack and Medium public RSS feeds
+- Newsletters sent to a dedicated address
 
-### Operations
-- Prometheus metrics (`/metrics` endpoint)
-- Structured logging (JSON)
-- Kubernetes-ready (CronJob + Deployment manifests)
+### Deployment Targets
+- First hosted target: Northflank with PostgreSQL
+- Self-hosted target: Docker, Docker Swarm, or K3s with SQLite
+- One Go application with database-specific behavior isolated behind storage adapters
 
 ## Quick Start
 

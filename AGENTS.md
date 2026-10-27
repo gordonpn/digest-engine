@@ -15,14 +15,16 @@ If new `.md` files are added later, treat them as part of the source guidance to
 
 ## Project intent (from existing docs)
 
-- Build a self-hosted feed digest engine with a **store-then-digest** model:
-  - Continuous polling stores and updates items.
-  - Scheduled digest jobs rank and send top items.
+- Build a personal information reader with a **store-then-understand** model:
+  - Continuous ingestion stores RSS items and newsletters sent to a dedicated address.
+  - A web reader is the primary consumption path; scheduled email delivery is optional.
 - Use a hexagonal/ports-and-adapters architecture (`domain`, `ports`, `adapters`, `internal`, `cmd`).
-- Prioritize observability (structured logs + Prometheus metrics) and operational simplicity (SQLite-first, K8s-ready).
+- Target Northflank with PostgreSQL first. Keep database-specific queries, migrations, and drivers behind storage adapters so a future self-hosted Docker, Swarm, or K3s profile can use SQLite without changing domain or application behavior.
+- Keep the initial application a single Go deployable and do not add multi-user or agent-platform infrastructure without a product need.
 
 ## Implementation expectations for agents
 
-- Preserve de-duplication across digest periods (via digest history tracking).
+- Treat fetched and emailed content as untrusted input; retain provenance and protect outbound fetches and rendered pages.
+- Preserve canonical article identity across sources while retaining source attribution.
 - Keep behavior aligned with configured schedules (`daily`/`weekly`/`monthly`) and feed-level filters/blocklists.
 - Favor clear, minimal abstractions and stdlib-first Go patterns where practical.

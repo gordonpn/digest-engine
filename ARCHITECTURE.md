@@ -1,5 +1,7 @@
 # Architecture
 
+Current product and deployment decisions are recorded in [ADR 0001](docs/adr/0001-northflank-postgresql-and-self-hosted-sqlite.md). The initial hosted target is Northflank with PostgreSQL; SQLite remains the target for future single-instance self-hosting.
+
 ## Design Philosophy
 
 Digest Engine is built with three principles:
@@ -21,11 +23,10 @@ Phase 1 (Continuous): Poller → Store
   - Updates scores as items gain traction
   - Result: High-fidelity dataset of "what was popular"
 
-Phase 2 (Scheduled): Store → Digest → Email
-  - Runs on user schedule (daily/weekly/monthly)
-  - Queries stored items by timeframe
-  - Ranks by final score (not initial score)
-  - Filters out items already sent in previous digests
+Phase 2 (On demand or scheduled): Store → Rank → Briefing → Reader
+  - Selects useful items from stored sources
+  - Builds a persistent reading experience
+  - May deliver selected briefings through optional channels
 ```
 
 **Why This Matters**: A post on Reddit might have 2 upvotes at hour 1, then 500 upvotes by hour 12. Traditional readers miss this. Digest Engine captures the trajectory.
@@ -224,17 +225,21 @@ func (c *Config) Validate() error {
 - Single binary (`go run cmd/Digest Engine/main.go serve`)
 - SQLite file in `./data/`
 
-### Production (Kubernetes)
-- **Poller**: Deployment with 1 replica (leader election not needed, SQLite is single-writer)
-- **Digester**: CronJob per schedule (daily, weekly, monthly)
-- **Storage**: PersistentVolumeClaim for SQLite file
-- **Secrets**: SMTP credentials in K8s Secret
+### Hosted target (Northflank)
+- **Application**: One Go service for the web reader and bounded background work
+- **Storage**: Managed PostgreSQL
+- **Newsletter input**: A dedicated address, isolated from the user's personal inbox
+
+### Self-hosted target (Docker, Swarm, or K3s)
+- **Application**: The same Go application in one container
+- **Storage**: SQLite on a persistent local volume
+- **Constraint**: Keep SQLite single-instance; do not share its files across replicas
 
 ## Trade-offs & Decisions
 
 | Decision | Why | Trade-off |
 |----------|-----|-----------|
-| SQLite vs Postgres | Simpler ops, single binary | No multi-writer (fine for this use case) |
+| PostgreSQL hosted, SQLite self-hosted | Managed hosted storage with a low-operations local option | Requires separate database adapters and migration/query sets |
 | Stdlib HTTP vs Gin | Learn middleware patterns | More boilerplate |
 | Worker pool vs Library | Understand concurrency | Reinventing wheel |
 | Embedded templates | No external dependencies | Harder to hot-reload |
@@ -242,7 +247,9 @@ func (c *Config) Validate() error {
 
 ## Future Enhancements
 
-- [x] Zero-Fluff & Anti-Clickbait enrichment pipeline (see [ENRICHMENT_DESIGN.md](file:///Users/gordonpn/workspace/digest-engine/ENRICHMENT_DESIGN.md))
-- [ ] Web UI for browsing archive
+- [ ] Zero-Fluff & Anti-Clickbait enrichment pipeline (see [ENRICHMENT_DESIGN.md](ENRICHMENT_DESIGN.md))
+- [ ] Searchable archive and reading queue
+- [ ] Explicit feedback and explainable recommendations
+- [ ] Story updates and research threads
 - [ ] Webhook receiver for "Save to Notion"
 - [ ] Multi-user support (user table, per-user configs)
