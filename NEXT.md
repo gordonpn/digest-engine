@@ -7,18 +7,17 @@
 - Priority: P1
 - Effort: M
 - Readiness: Ready
-- Reason: Establishes the hosted database path and preserves a future SQLite self-host profile before application persistence spreads.
+- Reason: This is the minimum storage foundation required before the first user-facing MVP slice: hosted newsletter ingestion in #7.
 - First action: Create the Go application skeleton and PostgreSQL storage adapter behind repository contracts.
 - Definition of Done: Northflank configuration selects PostgreSQL; migrations and integration checks run; domain and application packages do not depend on database drivers; the SQLite extension point is documented.
-- Unblocks: [#5 RSS-to-reader](https://github.com/gordonpn/digest-engine/issues/5) and [#7 dedicated-address newsletter ingestion](https://github.com/gordonpn/digest-engine/issues/7).
+- Unblocks: [#7 hosted newsletter ingestion](https://github.com/gordonpn/digest-engine/issues/7), the first user-facing slice, then [#5 RSS-to-reader](https://github.com/gordonpn/digest-engine/issues/5).
 
 ## NEXT
 
-- [#5 Ingest RSS and Atom items into a web reader](https://github.com/gordonpn/digest-engine/issues/5), P1 / M; depends on #4.
-- [#7 Ingest newsletters sent to a dedicated address](https://github.com/gordonpn/digest-engine/issues/7), P1 / M; depends on #4. The transport choice is part of this issue.
+- [#7 Ingest newsletters through a hosted dedicated address](https://github.com/gordonpn/digest-engine/issues/7), P1 / M; depends on #4 and is the first user-facing MVP slice. The managed inbound provider is selected as part of this issue.
+- [#5 Ingest RSS and Atom items into a web reader](https://github.com/gordonpn/digest-engine/issues/5), P1 / M; follows #7 in MVP delivery order and depends on #4.
 - [#6 Add Substack and Medium sources through public RSS](https://github.com/gordonpn/digest-engine/issues/6), P1 / S; depends on #5.
-- [#8 Protect article fetching and reader rendering](https://github.com/gordonpn/digest-engine/issues/8), P1 / M; can proceed with #5 after #4.
-- #5 and #7 can be implemented in parallel after the storage boundary is ready.
+- [#8 Protect article fetching and reader rendering](https://github.com/gordonpn/digest-engine/issues/8), P1 / M; can proceed after #4.
 
 ## LATER
 

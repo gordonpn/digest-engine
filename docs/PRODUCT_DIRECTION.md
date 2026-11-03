@@ -10,7 +10,8 @@ This document records deferred product ideas. It is a concept inventory, not a s
 
 - The first hosted target is Northflank with PostgreSQL.
 - The application remains a Go modular monolith. Keep database drivers, queries, and migrations behind storage adapters so a future SQLite profile can run on Docker, Docker Swarm, or K3s without changing domain behavior.
-- A dedicated newsletter address is part of the initial ingestion design. Do not connect to or ingest from the user's general personal inbox.
+- The first user-facing MVP slice is newsletter ingestion through a managed inbound-email service and a dedicated hosted address. Deliver this path before RSS/Atom ingestion; the PostgreSQL storage boundary is its prerequisite.
+- Keep provider-specific email delivery at the ingress boundary so a future self-hosted profile can use a different transport without changing newsletter processing. Do not connect to or ingest from the user's general personal inbox.
 - RSS and Atom are the first feed protocols. Substack and Medium content enters through public RSS feeds when available; do not bypass paywalls or depend on undocumented scraping.
 - The reader remains single-user initially. Use one server-side rendering owner; an AHA-style Go HTML and HTMX interface is the preferred direction, while the exact renderer remains an implementation choice.
 - Preserve original links and source attribution. Treat fetched pages and newsletter bodies as untrusted content.
