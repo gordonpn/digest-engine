@@ -4,6 +4,8 @@ This document provides step-by-step instructions for a coding agent (or develope
 
 > **Status:** The examples below are an early implementation sketch. Follow [ADR 0001](docs/adr/0001-northflank-postgresql-and-self-hosted-sqlite.md) and [Product Direction](docs/PRODUCT_DIRECTION.md) for current deployment and product constraints. New application logic must remain independent of database drivers; the first hosted profile uses PostgreSQL, and SQLite is the future self-hosted target.
 
+Delivery order is tracked in [NEXT.md](NEXT.md) and GitHub Issues: build the PostgreSQL storage boundary (#4), then hosted newsletter ingestion (#7), then RSS/Atom ingestion (#5). The phases below are an implementation reference, not the current delivery sequence.
+
 ## Phase 1: Core Infrastructure (Week 1)
 
 ### 1.1 Project Setup

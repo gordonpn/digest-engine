@@ -6,6 +6,8 @@ A personal information reader that collects RSS/Atom feeds and newsletters, then
 
 See [Product Direction](docs/PRODUCT_DIRECTION.md) and [ADR 0001](docs/adr/0001-northflank-postgresql-and-self-hosted-sqlite.md) for current decisions and deferred ideas.
 
+The first user-facing MVP slice is ingesting newsletters through a managed service and a dedicated hosted address. RSS/Atom ingestion follows that path.
+
 ## Overview
 
 Digest Engine solves the problem of information overload by:
