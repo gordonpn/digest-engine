@@ -5,6 +5,7 @@ import (
 	"errors"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/gordonpn/digest-engine/domain"
 	"github.com/gordonpn/digest-engine/ports"
@@ -64,14 +65,14 @@ func TestGetReaderProjectionAndMissingDocument(t *testing.T) {
 		if got != ctx || id != "doc-1" {
 			t.Fatal("incorrect lookup")
 		}
-		return domain.SourceDocument{ID: id, SourceID: "mailbox", From: "Author", Subject: "Essay", BodyText: "<script>untrusted</script>", RawMIME: []byte("private original"), Provider: "provider"}, nil
+		return domain.SourceDocument{ID: id, SourceID: "mailbox", From: "Author", Subject: "Essay", BodyText: "<script>untrusted</script>", ReceivedAt: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC), RawMIME: []byte("private original"), Provider: "provider"}, nil
 	}}
 	reader := NewReader(repo)
 	view, err := reader.Get(ctx, "doc-1")
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected := DocumentView{ID: "doc-1", SourceID: "mailbox", From: "Author", Subject: "Essay", BodyText: "<script>untrusted</script>"}
+	expected := DocumentView{ID: "doc-1", SourceID: "mailbox", From: "Author", Subject: "Essay", BodyText: "<script>untrusted</script>", ReceivedAt: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)}
 	if view != expected {
 		t.Fatalf("unexpected reader projection: %+v", view)
 	}

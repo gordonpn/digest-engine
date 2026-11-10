@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/gordonpn/digest-engine/domain"
 	"github.com/gordonpn/digest-engine/ports"
@@ -36,11 +37,12 @@ func (r *Reader) List(ctx context.Context, options ports.ListOptions) ([]domain.
 // DocumentView excludes retained MIME and transport metadata. BodyText is still
 // untrusted; an HTTP adapter must use contextual escaping rather than trusted HTML.
 type DocumentView struct {
-	ID       string
-	SourceID string
-	From     string
-	Subject  string
-	BodyText string
+	ID         string
+	SourceID   string
+	From       string
+	Subject    string
+	BodyText   string
+	ReceivedAt time.Time
 }
 
 func (r *Reader) Get(ctx context.Context, id string) (DocumentView, error) {
@@ -51,5 +53,5 @@ func (r *Reader) Get(ctx context.Context, id string) (DocumentView, error) {
 	if err != nil {
 		return DocumentView{}, fmt.Errorf("get newsletter: %w", err)
 	}
-	return DocumentView{ID: doc.ID, SourceID: doc.SourceID, From: doc.From, Subject: doc.Subject, BodyText: doc.BodyText}, nil
+	return DocumentView{ID: doc.ID, SourceID: doc.SourceID, From: doc.From, Subject: doc.Subject, BodyText: doc.BodyText, ReceivedAt: doc.ReceivedAt}, nil
 }
