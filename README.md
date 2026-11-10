@@ -2,7 +2,7 @@
 
 A personal information reader that collects RSS/Atom feeds and newsletters, then helps surface and revisit useful stories.
 
-> **Project status:** This repository is a design scaffold with examples; it does not yet contain a Go application. Feature checkboxes below describe planned behavior.
+> **Project status:** The Go HTTP bootstrap is implemented. Storage, ingestion, and reader features are still planned; feature checkboxes below describe that planned behavior.
 
 See [Product Direction](docs/PRODUCT_DIRECTION.md) and [ADR 0001](docs/adr/0001-northflank-postgresql-and-self-hosted-sqlite.md) for current decisions and deferred ideas.
 
@@ -60,40 +60,52 @@ Digest Engine solves the problem of information overload by:
 
 ### Local Development
 
-```bash
-# 1. Clone and configure
-git clone https://github.com/yourusername/Digest Engine
-cd Digest Engine
-cp config.example.yaml config.yaml
-
-# 2. Edit config.yaml with your feeds and SMTP settings
-
-# 3. Run locally
-go run cmd/Digest Engine/main.go poll   # Manual poll
-go run cmd/Digest Engine/main.go digest # Generate digest
-
-# 4. Run with scheduler
-go run cmd/Digest Engine/main.go serve  # Starts HTTP + Cron
-```
-
-### Docker
+Requires Go 1.25 or newer. From the repository root:
 
 ```bash
-docker build -t Digest Engine:latest .
-docker run -v $(pwd)/config.yaml:/app/config.yaml \
-           -v $(pwd)/data:/app/data \
-           Digest Engine:latest serve
+go test -race ./...
+go vet ./...
+go run ./cmd/digest-engine
 ```
 
-### Kubernetes (K3s)
+In another terminal, `curl -fsS http://localhost:8080/livez` returns `ok`.
+For a binary that receives signals directly:
 
 ```bash
-kubectl apply -f k8s/
+go build -o /tmp/digest-engine ./cmd/digest-engine
+PORT=9090 /tmp/digest-engine
 ```
+
+Send SIGINT (Ctrl-C) or SIGTERM to stop accepting connections and drain active
+requests. Shutdown has a bounded grace period; remaining connections are closed
+when it expires. A startup failure or shutdown timeout exits with status 1.
+
+| Environment variable | Default | Validation |
+|---|---|---|
+| `PORT` | `8080` | Integer from 1 through 65535; listens on all interfaces |
+| `DIGEST_ENGINE_SHUTDOWN_TIMEOUT` | `10s` | Positive Go duration, such as `15s` |
+
+Configuration errors name the field without logging its value. The bootstrap
+uses only these environment variables; it does not load `config.example.yaml`.
+`GET /livez` reports process liveness, not database or ingestion readiness.
+HTTP header/read/write/idle timeouts are 5/15/30/60 seconds respectively.
+
+### Package layout
+
+- `cmd/digest-engine`: process entry point and signal handling.
+- `internal/config`: validated runtime environment configuration.
+- `internal/app`: application wiring and HTTP lifecycle.
+- `adapters/httpserver`: HTTP routes.
+- `domain` and `ports`: reserved for business models and integration contracts.
+
+The existing Dockerfile, YAML configuration, and deployment sketches describe
+future functionality. Container deployment, database readiness, `poll`, `digest`,
+and `serve` subcommands are not implemented by this bootstrap. The executable
+starts the HTTP server directly.
 
 ## Configuration
 
-See `config.example.yaml` for full documentation. Key sections:
+The legacy `config.example.yaml` is a design example, not runtime input yet. Planned sections include:
 
 ```yaml
 feeds:
