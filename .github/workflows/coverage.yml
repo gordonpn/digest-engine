@@ -15,14 +15,10 @@ permissions:
   contents: read
 
 jobs:
-  test-coverage:
-    name: runner / coverage
+  test:
+    name: runner / coverage test
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    permissions:
-      contents: read
-      pull-requests: write
-      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,6 +31,30 @@ jobs:
 
       - name: Run tests with coverage
         run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
+
+      - name: Archive coverage profile
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-profile
+          path: coverage.out
+          retention-days: 1
+
+  upload:
+    name: runner / coverage upload
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download coverage profile
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-profile
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
