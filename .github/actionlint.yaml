@@ -1,0 +1,10 @@
+self-hosted-runner:
+  labels: []
+
+config-variables: null
+
+paths:
+  .github/workflows/**/*.yml:
+    ignore:
+      - 'runtime "node20" is deprecated'
+
