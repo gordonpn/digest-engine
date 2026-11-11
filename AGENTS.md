@@ -28,3 +28,7 @@ If new `.md` files are added later, treat them as part of the source guidance to
 - Preserve canonical article identity across sources while retaining source attribution.
 - Keep behavior aligned with configured schedules (`daily`/`weekly`/`monthly`) and feed-level filters/blocklists.
 - Favor clear, minimal abstractions and stdlib-first Go patterns where practical.
+
+## Lessons
+
+- When a service targets different hosted and self-hosted databases, keep dialect-specific SQL and migrations behind storage adapters and verify each supported backend.
