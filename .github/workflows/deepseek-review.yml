@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Checkout repository
         if: env.DEEPSEEK_API_KEY != ''
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Load DeepSeek review prompt
         if: env.DEEPSEEK_API_KEY != ''
