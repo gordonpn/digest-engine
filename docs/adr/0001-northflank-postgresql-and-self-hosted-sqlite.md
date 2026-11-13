@@ -23,7 +23,7 @@ The product is initially a single-user reading application. It does not need a m
 - SQLite remains an option for a simple, single-instance self-hosted deployment.
 - Supporting two database engines requires separate query and migration implementations and verification against each supported engine when the SQLite profile is added.
 - SQLite deployments must keep the database on durable local storage and run a single writer instance. Do not share one SQLite file between replicas.
-- The inbound email transport is still an implementation decision. It must support the dedicated-address boundary and fit the hosted and self-hosted deployment goals.
+- Mailgun Routes has been selected for hosted inbound email in [PR #26](https://github.com/gordonpn/digest-engine/pull/26), which records the provider decision and ingress contract for [#18](https://github.com/gordonpn/digest-engine/issues/18). Account and DNS provisioning, endpoint implementation, and live delivery/replay verification remain pending under #20 and #23. A future self-hosted transport must preserve the same provider-independent message contract and dedicated-address boundary.
 
 ## Reconsideration Triggers
 
