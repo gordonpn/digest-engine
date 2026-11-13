@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: Run actionlint with reviewdog
         uses: reviewdog/action-actionlint@v1
