@@ -25,4 +25,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
           fail_level: error
-          actionlint_flags: -ignore 'runtime "node20" is deprecated'
