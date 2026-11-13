@@ -26,6 +26,6 @@ This document records non-obvious engineering and implementation decisions made 
 ## 2026-10-26: Northflank with PostgreSQL and future self-hosted SQLite profile
 
 - Decision: Target Northflank with PostgreSQL for the initial hosted deployment while keeping database drivers, SQL dialects, and migrations isolated behind storage adapters to permit a future self-hosted single-instance SQLite profile.
-- Rationale: Hosted Northflank requires PostgreSQL for persistence, but self-hosted single-instance deployments benefit from a zero-configuration local SQLite database without altering core domain logic.
+- Rationale: PostgreSQL was selected for managed hosted storage on Northflank; self-hosted single-instance deployments benefit from a local SQLite database without altering core domain logic. This is a project choice, not a Northflank platform requirement.
 - Rejected alternatives: Hardcoding PostgreSQL types directly in domain entities, requiring an external PostgreSQL instance for self-hosting.
 - Source: [ADR 0001](adr/0001-northflank-postgresql-and-self-hosted-sqlite.md), [#4 Keep PostgreSQL and SQLite behind the storage boundary](https://github.com/gordonpn/digest-engine/issues/4)
