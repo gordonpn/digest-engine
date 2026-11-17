@@ -137,6 +137,19 @@ This project is designed to balance:
 
 See `ARCHITECTURE.md` for design decisions.
 
+## Automated pull request reviews
+
+DeepSeek Review and PR-Agent run when an eligible same-repository pull request
+opens, reopens, becomes ready for review, or receives a push, including while
+it is a draft. A push containing multiple commits produces one review event.
+Fork and Dependabot pull requests are excluded from credentialed review.
+Authorized PR comments can also invoke PR-Agent.
+
+Set the repository Actions secret `DEEPSEEK_API_KEY` to enable both reviewers.
+Both jobs fail before reviewing if the key is missing or DeepSeek's
+`https://api.deepseek.com/models` endpoint rejects the request or cannot be
+reached. Review requests use the same official API base.
+
 ## License
 
 MIT
