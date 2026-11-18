@@ -1,0 +1,64 @@
+name: PR-Agent
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  pr_agent:
+    name: runner / pr-agent
+    if: |
+      github.event.sender.type != 'Bot' && github.actor != 'dependabot[bot]' &&
+      ((github.event_name == 'pull_request' &&
+         github.event.pull_request.head.repo.full_name == github.repository &&
+         github.event.pull_request.user.type != 'Bot' && github.event.pull_request.user.login != 'dependabot[bot]') ||
+        (github.event_name == 'issue_comment' &&
+         github.event.sender.type != 'Bot' &&
+         github.event.issue.pull_request &&
+         contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DEEPSEEK_API_BASE: https://api.deepseek.com
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Check comment pull request eligibility
+        if: github.event_name == 'issue_comment'
+        id: eligibility
+        run: bash .github/scripts/check-review-pr.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+
+      - name: Verify DeepSeek access
+        if: github.event_name == 'pull_request' || steps.eligibility.outputs.eligible == 'true'
+        run: bash .github/scripts/check-deepseek.sh
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+
+      - name: PR Agent Action
+        if: github.event_name == 'pull_request' || steps.eligibility.outputs.eligible == 'true'
+        uses: docker://pragent/pr-agent:github_action@sha256:31b9aac6ab067bada9a0c1b001d30ebc500ea4487e00a93c18c59b9ef5fa66db
+        env:
+          CONFIG.MODEL: "deepseek/deepseek-v4-flash"
+          CONFIG.FALLBACK_MODELS: '["deepseek/deepseek-v4-pro"]'
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          OPENAI_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          OPENAI.KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          OPENAI.API_BASE: ${{ env.DEEPSEEK_API_BASE }}
+          GITHUB_ACTION_CONFIG__HANDLE_PUSH_TRIGGER: "true"
+          GITHUB_ACTION_CONFIG__PUSH_TRIGGER_IGNORE_MERGE_COMMITS: "false"
+          GITHUB_ACTION_CONFIG__PUSH_TRIGGER_IGNORE_BOT_COMMITS: "false"
+          GITHUB_ACTION_CONFIG__PUSH_COMMANDS: '["/review"]'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

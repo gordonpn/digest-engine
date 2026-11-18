@@ -1,0 +1,45 @@
+name: DeepSeek Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    name: runner / deepseek-review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.sender.type != 'Bot' && github.actor != 'dependabot[bot]' && github.event.pull_request.user.type != 'Bot' && github.event.pull_request.user.login != 'dependabot[bot]' }}
+    env:
+      DEEPSEEK_API_BASE: https://api.deepseek.com
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Verify DeepSeek access
+        run: bash .github/scripts/check-deepseek.sh
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+
+      - name: Load DeepSeek review prompt
+        id: prompt
+        run: |
+          {
+            echo "prompt<<EOF_DEEPSEEK_PROMPT"
+            cat .github/prompts/deepseek-review.md
+            echo ""
+            echo "EOF_DEEPSEEK_PROMPT"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: DeepSeek Code Review
+        uses: hustcer/deepseek-review@eccde2e9781008d795e366b951e313e37af88dd5 # v1
+        with:
+          chat-token: ${{ secrets.DEEPSEEK_API_KEY }}
+          base-url: ${{ env.DEEPSEEK_API_BASE }}
+          sys-prompt: ${{ steps.prompt.outputs.prompt }}
