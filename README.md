@@ -142,7 +142,8 @@ See `ARCHITECTURE.md` for design decisions.
 DeepSeek Review and PR-Agent run when an eligible same-repository pull request
 opens, reopens, becomes ready for review, or receives a push, including while
 it is a draft. A push containing multiple commits produces one review event.
-Fork and Dependabot pull requests are excluded from credentialed review.
+Fork-origin PRs, bot-authored PRs, bot-triggered events, and Dependabot are
+excluded from credentialed review, including comment requests.
 Authorized PR comments can also invoke PR-Agent.
 
 Set the repository Actions secret `DEEPSEEK_API_KEY` to enable both reviewers.
